@@ -1,11 +1,7 @@
 package com.example.mypad
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "notes")
 data class Note(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val id: Long = System.currentTimeMillis(),
     val content: String,
     val orderIndex: Int,
     val createdAt: Long = System.currentTimeMillis(),
