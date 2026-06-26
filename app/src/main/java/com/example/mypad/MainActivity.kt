@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -18,7 +17,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: NoteAdapter
-    private lateinit var fab: FloatingActionButton
     private val noteDao by lazy { AppDatabase.get(this).noteDao() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,14 +24,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         recyclerView = findViewById(R.id.recycler_view)
-        fab = findViewById(R.id.fab_add)
-
         recyclerView.layoutManager = LinearLayoutManager(this)
         loadNotes()
-
-        fab.setOnClickListener {
-            startActivity(Intent(this, NoteEditActivity::class.java))
-        }
 
         val touchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.START or ItemTouchHelper.END
@@ -61,7 +53,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         loadNotes()
-        adapter.clearSelection()
+        if (::adapter.isInitialized) adapter.clearSelection()
     }
 
     private fun loadNotes() {
@@ -71,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(this, NoteEditActivity::class.java)
                 intent.putExtra("note_id", note.id)
                 startActivity(intent)
-            }, {})
+            })
             recyclerView.adapter = adapter
         } else {
             adapter.updateNotes(notes)
@@ -85,6 +77,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_new -> {
+                startActivity(Intent(this, NoteEditActivity::class.java))
+                true
+            }
             R.id.action_import -> { importMd(); true }
             R.id.action_export -> { exportMd(); true }
             R.id.action_delete_selected -> { batchDelete(); true }
@@ -95,11 +91,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.action_delete_selected).isVisible = adapter.selectionMode
-        menu.findItem(R.id.action_select_all).isVisible = adapter.selectionMode
-        menu.findItem(R.id.action_cancel_select).isVisible = adapter.selectionMode
-        menu.findItem(R.id.action_import).isVisible = !adapter.selectionMode
-        menu.findItem(R.id.action_export).isVisible = !adapter.selectionMode
+        menu.findItem(R.id.action_delete_selected).isVisible = ::adapter.isInitialized && adapter.selectionMode
+        menu.findItem(R.id.action_select_all).isVisible = ::adapter.isInitialized && adapter.selectionMode
+        menu.findItem(R.id.action_cancel_select).isVisible = ::adapter.isInitialized && adapter.selectionMode
+        menu.findItem(R.id.action_new).isVisible = !(::adapter.isInitialized && adapter.selectionMode)
+        menu.findItem(R.id.action_import).isVisible = !(::adapter.isInitialized && adapter.selectionMode)
+        menu.findItem(R.id.action_export).isVisible = !(::adapter.isInitialized && adapter.selectionMode)
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -180,17 +177,17 @@ class MainActivity : AppCompatActivity() {
                 val text = contentResolver.openInputStream(uri)?.use { input ->
                     BufferedReader(InputStreamReader(input)).readText()
                 } ?: return@registerForActivityResult
-                val notes = parseMarkdown(text)
-                if (notes.isEmpty()) {
+                val p = parseMarkdown(text)
+                if (p.isEmpty()) {
                     Toast.makeText(this, "未解析到笔记", Toast.LENGTH_SHORT).show(); return@registerForActivityResult
                 }
                 var maxOrder = noteDao.getAll().maxOfOrNull { it.orderIndex } ?: -1
-                notes.forEach { content ->
+                p.forEach { content ->
                     maxOrder++
                     noteDao.insert(Note(content = content, orderIndex = maxOrder))
                 }
                 loadNotes()
-                Toast.makeText(this, "导入 ${notes.size} 条笔记", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "导入 ${p.size} 条笔记", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Toast.makeText(this, "导入失败: ${e.message}", Toast.LENGTH_LONG).show()
             }
@@ -199,12 +196,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun parseMarkdown(text: String): List<String> {
         val notes = mutableListOf<String>()
-        val parts = text.split(Regex("(?m)^---\\s*$"))
-        parts.forEach { part ->
+        text.split(Regex("(?m)^---\\s*$")).forEach { part ->
             val trimmed = part.trim()
-            if (trimmed.isNotBlank()) {
-                notes.add(trimmed)
-            }
+            if (trimmed.isNotBlank()) notes.add(trimmed)
         }
         return notes
     }
