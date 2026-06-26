@@ -41,6 +41,11 @@ class NoteAdapter(
         notifyDataSetChanged()
     }
 
+    fun moveItem(fromPos: Int, toPos: Int) {
+        notes.removeAt(fromPos).also { notes.add(toPos, it) }
+        notifyItemMoved(fromPos, toPos)
+    }
+
     fun getNotes(): MutableList<Note> = notes
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

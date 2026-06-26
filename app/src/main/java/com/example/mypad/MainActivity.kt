@@ -29,12 +29,10 @@ class MainActivity : AppCompatActivity() {
             ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.START or ItemTouchHelper.END
         ) {
             override fun onMove(rv: RecyclerView, from: RecyclerView.ViewHolder, to: RecyclerView.ViewHolder): Boolean {
-                val notes = adapter.getNotes()
                 val fromPos = from.adapterPosition
                 val toPos = to.adapterPosition
-                notes.removeAt(fromPos).also { notes.add(toPos, it) }
-                notes.forEachIndexed { i, n -> storage.updateOrder(n.id, i) }
-                adapter.updateNotes(notes)
+                adapter.moveItem(fromPos, toPos)
+                adapter.getNotes().forEachIndexed { i, n -> storage.updateOrder(n.id, i) }
                 return true
             }
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
