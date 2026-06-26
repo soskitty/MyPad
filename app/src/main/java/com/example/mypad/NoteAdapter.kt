@@ -10,8 +10,7 @@ import java.util.*
 
 class NoteAdapter(
     private var notes: MutableList<Note>,
-    private val onItemClick: (Note) -> Unit,
-    private val onDragListener: (NoteAdapter) -> Unit
+    private val onItemClick: (Note) -> Unit
 ) : RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
 
     var selectionMode = false
