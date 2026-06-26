@@ -27,8 +27,9 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_cancel_select"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
         android:title="取消选择"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_select"
         android:icon="@android:drawable/ic_menu_manage"
