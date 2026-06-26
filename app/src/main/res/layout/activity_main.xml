@@ -18,7 +18,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:contentDescription="新建笔记"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@android:drawable/ic_menu_add"
         app:fabSize="normal" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
