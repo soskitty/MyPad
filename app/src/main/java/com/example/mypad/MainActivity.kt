@@ -114,8 +114,7 @@ class MainActivity : AppCompatActivity() {
         if (list.isEmpty()) { Toast.makeText(this, "无笔记可导出", Toast.LENGTH_SHORT).show(); return }
         val sb = StringBuilder()
         list.forEach { n ->
-            sb.appendLine("# ${n.title}"); sb.appendLine(); sb.appendLine(n.content)
-            sb.appendLine(); sb.appendLine("---"); sb.appendLine()
+            sb.appendLine(n.content); sb.appendLine(); sb.appendLine("---"); sb.appendLine()
         }
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE); type = "text/markdown"
