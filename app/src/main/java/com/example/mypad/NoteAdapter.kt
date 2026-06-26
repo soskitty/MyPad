@@ -24,6 +24,12 @@ class NoteAdapter(
         notifyDataSetChanged()
     }
 
+    fun enterSelectionMode() {
+        selectionMode = true
+        selectedIds.clear()
+        notifyDataSetChanged()
+    }
+
     fun clearSelection() {
         selectedIds.clear()
         selectionMode = false
@@ -71,14 +77,7 @@ class NoteAdapter(
                 onItemClick(note)
             }
         }
-        holder.itemView.setOnLongClickListener {
-            if (!selectionMode) {
-                selectionMode = true
-                selectedIds.add(note.id)
-                notifyDataSetChanged()
-            }
-            true
-        }
+        holder.itemView.setOnLongClickListener(null)
     }
 
     override fun getItemCount() = notes.size

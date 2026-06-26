@@ -29,4 +29,9 @@
         android:id="@+id/action_cancel_select"
         android:title="取消选择"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_select"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="选择"
+        app:showAsAction="ifRoom" />
 </menu>

@@ -75,7 +75,8 @@ class MainActivity : AppCompatActivity() {
             R.id.action_export -> { exportMd(); true }
             R.id.action_delete_selected -> { batchDelete(); true }
             R.id.action_select_all -> { adapter.selectAll(); true }
-            R.id.action_cancel_select -> { adapter.clearSelection(); true }
+            R.id.action_cancel_select -> { adapter.clearSelection(); invalidateOptionsMenu(); true }
+            R.id.action_select -> { adapter.enterSelectionMode(); invalidateOptionsMenu(); true }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -85,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         menu.findItem(R.id.action_delete_selected).isVisible = sel
         menu.findItem(R.id.action_select_all).isVisible = sel
         menu.findItem(R.id.action_cancel_select).isVisible = sel
+        menu.findItem(R.id.action_select).isVisible = !sel
         menu.findItem(R.id.action_new).isVisible = !sel
         menu.findItem(R.id.action_import).isVisible = !sel
         menu.findItem(R.id.action_export).isVisible = !sel
