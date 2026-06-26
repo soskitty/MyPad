@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="12dp">
+    android:paddingVertical="4dp"
+    android:paddingHorizontal="12dp">
 
     <CheckBox
         android:id="@+id/cb_select"
