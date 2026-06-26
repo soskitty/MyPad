@@ -12,6 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
 class MainActivity : AppCompatActivity() {
 
@@ -112,20 +115,29 @@ class MainActivity : AppCompatActivity() {
     private fun exportMd() {
         val list = storage.getAll()
         if (list.isEmpty()) { Toast.makeText(this, "无笔记可导出", Toast.LENGTH_SHORT).show(); return }
-        val sb = StringBuilder()
-        list.forEach { n ->
-            sb.appendLine(n.content); sb.appendLine(); sb.appendLine("---"); sb.appendLine()
+        try {
+            val baos = java.io.ByteArrayOutputStream()
+            ZipOutputStream(baos).use { zos ->
+                list.forEachIndexed { i, n ->
+                    val name = "note_%03d_%s.md".format(i + 1, n.title.take(20).replace(Regex("[/\\\\:*?\"<>|]"), "_"))
+                    zos.putNextEntry(ZipEntry(name))
+                    zos.write(n.content.toByteArray())
+                    zos.closeEntry()
+                }
+            }
+            pendingExport = baos.toByteArray()
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE); type = "application/zip"
+                putExtra(Intent.EXTRA_TITLE, "mypad_${System.currentTimeMillis()}.zip")
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            }
+            exportLauncher.launch(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "导出失败: ${e.message}", Toast.LENGTH_LONG).show()
         }
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE); type = "text/markdown"
-            putExtra(Intent.EXTRA_TITLE, "mypad_${System.currentTimeMillis()}.md")
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        }
-        pendingExport = sb.toString()
-        exportLauncher.launch(intent)
     }
 
-    private var pendingExport: String? = null
+    private var pendingExport: ByteArray? = null
 
     private val exportLauncher = registerForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
@@ -133,7 +145,7 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK && result.data?.data != null) {
             try {
                 contentResolver.openOutputStream(result.data!!.data!!)?.use { out ->
-                    out.write((pendingExport ?: "").toByteArray())
+                    out.write(pendingExport ?: ByteArray(0))
                 }
                 Toast.makeText(this, "导出成功", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
@@ -145,7 +157,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun importMd() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE); type = "text/markdown"
+            addCategory(Intent.CATEGORY_OPENABLE); type = "application/zip"
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         }
         importLauncher.launch(intent)
@@ -156,15 +168,25 @@ class MainActivity : AppCompatActivity() {
     ) { result ->
         if (result.resultCode == RESULT_OK && result.data?.data != null) {
             try {
-                val text = contentResolver.openInputStream(result.data!!.data!!)?.use {
-                    BufferedReader(InputStreamReader(it)).readText()
-                } ?: return@registerForActivityResult
-                val parts = text.split(Regex("(?m)^---\\s*$")).map { it.trim() }.filter { it.isNotBlank() }
-                if (parts.isEmpty()) { Toast.makeText(this, "未解析到笔记", Toast.LENGTH_SHORT).show(); return@registerForActivityResult }
+                val entries = mutableListOf<String>()
+                contentResolver.openInputStream(result.data!!.data!!)?.use { input ->
+                    ZipInputStream(input).use { zis ->
+                        var entry = zis.nextEntry
+                        while (entry != null) {
+                            if (!entry.isDirectory && entry.name.endsWith(".md")) {
+                                val content = zis.readBytes().toString(Charsets.UTF_8)
+                                entries.add(content)
+                            }
+                            zis.closeEntry()
+                            entry = zis.nextEntry
+                        }
+                    }
+                }
+                if (entries.isEmpty()) { Toast.makeText(this, "未找到 .md 文件", Toast.LENGTH_SHORT).show(); return@registerForActivityResult }
                 var maxOrder = storage.getAll().maxOfOrNull { it.orderIndex } ?: -1
-                parts.forEach { content -> maxOrder++; storage.insert(Note(content = content, orderIndex = maxOrder)) }
+                entries.forEach { content -> maxOrder++; storage.insert(Note(content = content, orderIndex = maxOrder)) }
                 loadNotes()
-                Toast.makeText(this, "导入 ${parts.size} 条笔记", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "导入 ${entries.size} 条笔记", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Toast.makeText(this, "导入失败: ${e.message}", Toast.LENGTH_LONG).show()
             }
