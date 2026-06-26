@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_import"
+        android:icon="@android:drawable/ic_menu_upload"
+        android:title="导入"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_export"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="导出"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_select_all"
+        android:title="全选"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_delete_selected"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="批量删除"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_cancel_select"
+        android:title="取消选择"
+        app:showAsAction="never" />
+</menu>
