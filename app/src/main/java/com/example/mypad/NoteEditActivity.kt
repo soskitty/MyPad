@@ -1,8 +1,11 @@
 package com.example.mypad
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.ViewGroup
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.NestedScrollView
 
 class NoteEditActivity : AppCompatActivity() {
 
@@ -12,17 +15,33 @@ class NoteEditActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         editText = EditText(this).apply {
-            layoutParams = android.view.ViewGroup.LayoutParams(
-                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                android.view.ViewGroup.LayoutParams.MATCH_PARENT
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
             )
             textSize = 16f
             setPadding(32, 32, 32, 32)
-            setBackgroundColor(android.graphics.Color.WHITE)
-            setTextColor(android.graphics.Color.BLACK)
+            setBackgroundColor(Color.WHITE)
+            setTextColor(Color.BLACK)
+            isHorizontalScrollBarEnabled = false
+            isVerticalScrollBarEnabled = false
         }
-        setContentView(editText)
+
+        val scrollView = NestedScrollView(this).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            setFillViewport(true)
+            isNestedScrollingEnabled = true
+            overScrollMode = NestedScrollView.OVER_SCROLL_IF_CONTENT_SCROLLS
+            addView(editText)
+        }
+
+        setContentView(scrollView)
+
         noteId = intent.getLongExtra("note_id", -1L)
         if (noteId != -1L) {
             val note = storage.getAll().find { it.id == noteId }
