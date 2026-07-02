@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
             val baos = java.io.ByteArrayOutputStream()
             ZipOutputStream(baos).use { zos ->
                 list.forEachIndexed { i, n ->
-                    val name = "note_%03d_%s.md".format(i + 1, n.title.take(20).replace(Regex("[/\\\\:*?\"<>|]"), "_"))
+                    val name = "note_%03d_%s.txt".format(i + 1, n.title.take(20).replace(Regex("[/\\\\:*?\"<>|]"), "_"))
                     zos.putNextEntry(ZipEntry(name))
                     zos.write(n.content.toByteArray())
                     zos.closeEntry()
@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
                     ZipInputStream(input).use { zis ->
                         var entry = zis.nextEntry
                         while (entry != null) {
-                            if (!entry.isDirectory && entry.name.endsWith(".md")) {
+                            if (!entry.isDirectory && entry.name.endsWith(".txt")) {
                                 val content = zis.readBytes().toString(Charsets.UTF_8)
                                 entries.add(content)
                             }
@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-                if (entries.isEmpty()) { Toast.makeText(this, "未找到 .md 文件", Toast.LENGTH_SHORT).show(); return@registerForActivityResult }
+                if (entries.isEmpty()) { Toast.makeText(this, "未找到 .txt 文件", Toast.LENGTH_SHORT).show(); return@registerForActivityResult }
                 var maxOrder = storage.getAll().maxOfOrNull { it.orderIndex } ?: -1
                 entries.forEach { content -> maxOrder++; storage.insert(Note(content = content, orderIndex = maxOrder)) }
                 loadNotes()
