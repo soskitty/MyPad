@@ -1,7 +1,5 @@
 package com.example.mypad
 
-import android.app.PendingIntent
-import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
@@ -30,9 +28,7 @@ class NoteWidgetFactory(private val context: Context) : RemoteViewsService.Remot
         val fillIntent = Intent().apply {
             putExtra("note_id", note.id)
         }
-        val flags = if (android.os.Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
-        val pi = PendingIntent.getBroadcast(context, note.id.toInt(), fillIntent, flags)
-        views.setOnClickFillInIntent(R.id.widget_item_title, fillIntent)
+        views.setOnClickFillInIntent(R.id.widget_item_root, fillIntent)
         return views
     }
 
