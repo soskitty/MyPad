@@ -29,9 +29,5 @@
                 android:resource="@xml/note_widget_info" />
         </receiver>
 
-        <service
-            android:name=".NoteWidgetService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 </manifest>
