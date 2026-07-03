@@ -20,29 +20,14 @@ class NoteWidgetProvider : AppWidgetProvider() {
             views.setRemoteAdapter(R.id.widget_list, intent)
             views.setTextViewText(R.id.widget_title, "MyPad")
 
-            val clickIntent = Intent(context, NoteWidgetProvider::class.java).apply {
-                action = "com.example.mypad.OPEN_NOTE"
+            val tapIntent = Intent(context, NoteEditActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
             val flags = if (android.os.Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
-            val pi = PendingIntent.getBroadcast(context, 0, clickIntent, flags)
+            val pi = PendingIntent.getActivity(context, 0, tapIntent, flags)
             views.setPendingIntentTemplate(R.id.widget_list, pi)
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }
-    }
-
-    override fun onReceive(context: Context, intent: Intent) {
-        if ("com.example.mypad.OPEN_NOTE" == intent.action) {
-            val noteId = intent.getLongExtra("note_id", -1L)
-            if (noteId != -1L) {
-                val editIntent = Intent(context, NoteEditActivity::class.java).apply {
-                    putExtra("note_id", noteId)
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-                context.startActivity(editIntent)
-            }
-            return
-        }
-        super.onReceive(context, intent)
     }
 }
