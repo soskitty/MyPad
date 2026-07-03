@@ -24,10 +24,9 @@ class NoteWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(slotIds[i], note.title)
                     views.setViewVisibility(slotIds[i], android.view.View.VISIBLE)
 
-                    val tapIntent = Intent(context, NoteEditActivity::class.java).apply {
-                        putExtra("note_id", note.id)
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    }
+                    val tapIntent = Intent(context, NoteEditActivity::class.java)
+                    tapIntent.putExtra("note_id", note.id)
+                    tapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     val pi = PendingIntent.getActivity(context, note.id.toInt(), tapIntent, flags)
                     views.setOnClickPendingIntent(slotIds[i], pi)
                 } else {
