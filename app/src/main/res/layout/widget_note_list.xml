@@ -11,17 +11,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="MyPad"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:textStyle="bold"
         android:textColor="#333333"
-        android:paddingBottom="4dp" />
+        android:paddingBottom="3dp" />
 
-    <TextView
-        android:id="@+id/widget_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="12sp"
-        android:textColor="#666666"
-        android:lineSpacingExtra="4dp" />
+        android:orientation="vertical">
+
+        <TextView android:id="@+id/line_1" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:textSize="12sp" android:textColor="#555555" android:maxLines="1" android:ellipsize="end" android:paddingVertical="2dp" />
+        <View android:id="@+id/div_1" android:layout_width="match_parent" android:layout_height="1px" android:background="#EEEEEE" />
+        <TextView android:id="@+id/line_2" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:textSize="12sp" android:textColor="#555555" android:maxLines="1" android:ellipsize="end" android:paddingVertical="2dp" />
+        <View android:id="@+id/div_2" android:layout_width="match_parent" android:layout_height="1px" android:background="#EEEEEE" />
+        <TextView android:id="@+id/line_3" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:textSize="12sp" android:textColor="#555555" android:maxLines="1" android:ellipsize="end" android:paddingVertical="2dp" />
+        <View android:id="@+id/div_3" android:layout_width="match_parent" android:layout_height="1px" android:background="#EEEEEE" />
+        <TextView android:id="@+id/line_4" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:textSize="12sp" android:textColor="#555555" android:maxLines="1" android:ellipsize="end" android:paddingVertical="2dp" />
+        <View android:id="@+id/div_4" android:layout_width="match_parent" android:layout_height="1px" android:background="#EEEEEE" />
+        <TextView android:id="@+id/line_5" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:textSize="12sp" android:textColor="#555555" android:maxLines="1" android:ellipsize="end" android:paddingVertical="2dp" />
+        <View android:id="@+id/div_5" android:layout_width="match_parent" android:layout_height="1px" android:background="#EEEEEE" />
+        <TextView android:id="@+id/line_6" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:textSize="12sp" android:textColor="#555555" android:maxLines="1" android:ellipsize="end" android:paddingVertical="2dp" />
+
+    </LinearLayout>
 
 </LinearLayout>
